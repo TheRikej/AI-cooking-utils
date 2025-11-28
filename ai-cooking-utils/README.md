@@ -22,6 +22,7 @@ cookAID is a web app that helps users plan and manage meals by providing recipes
 1. Clone the repository: `git clone https://github.com/TheRikej/AI-cooking-utils.git`
 2. Install dependencies: `npm install`
 3. Run the development server: `npm run dev`
+4. Seed the database : `npm run seed`
 
 ## Getting Started
 
