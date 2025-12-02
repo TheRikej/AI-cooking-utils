@@ -1,4 +1,3 @@
-// src/components/layout/site-header.tsx
 "use client";
 
 import Link from "next/link";
@@ -51,6 +50,7 @@ export function SiteHeader() {
           <Button variant="outline" size="sm" className="hidden md:inline-flex">
             Log in
           </Button>
+          {/* TODO replace with user image */}
           <Avatar className="h-8 w-8">
             <AvatarImage src="" alt="User avatar" />
             <AvatarFallback>U</AvatarFallback>

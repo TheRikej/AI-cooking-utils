@@ -5,7 +5,7 @@ import { mealPlanEntries } from "./mealPlan";
 
 export const users = sqliteTable("users", {
   id: text("id").primaryKey(),
-  name: text("name"),
+  name: text("name").notNull(),
   email: text("email").notNull().unique(),
   image: text("image"),
 
