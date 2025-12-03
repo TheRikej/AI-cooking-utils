@@ -10,6 +10,8 @@
     "seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
+    "@auth/core": "^0.41.0",
+    "@auth/drizzle-adapter": "^1.11.1",
     "@libsql/client": "^0.15.15",
     "@radix-ui/react-avatar": "^1.1.11",
     "@radix-ui/react-dialog": "^1.1.15",
@@ -22,7 +24,7 @@
     "drizzle-orm": "^0.44.7",
     "lucide-react": "^0.555.0",
     "next": "16.0.3",
-    "next-auth": "^4.24.13",
+    "next-auth": "^5.0.0-beta.30",
     "postcss": "^8.5.6",
     "react": "19.2.0",
     "react-dom": "19.2.0",
