@@ -1,15 +1,24 @@
-import { NewProfileForm } from "@/components/account/new-profile-form";
-import { getUserDetails } from "@/server/users"; // Fetch the user details from the DB
+"use server";
 
-export const dynamic = "force-dynamic";
+import { NewProfileForm } from "@/components/account/new-profile-form";
+import { getAuthUser, getUserProfileAction } from "@/server-actions/account";
+import { User } from "next-auth";
 
 export default async function AccountPage() {
-  const userId = "admin-1"; //TODO
-  const user = await getUserDetails(userId);
+  const authuser = await getAuthUser();
 
-  if (!user) {
+  if (!authuser) {
     return <div>User not found</div>;
   }
+
+  const newestUser = await getUserProfileAction(authuser.id);
+
+  const user: User = {
+    id: newestUser?.id,
+    name: newestUser?.name ?? "Default Name",
+    email: newestUser?.email,
+    image: newestUser?.image,
+  };
 
   return (
     <div className="mx-auto w-full max-w-2xl space-y-6">

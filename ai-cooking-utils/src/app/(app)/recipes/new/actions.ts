@@ -3,9 +3,16 @@
 import { redirect } from "next/navigation";
 import { createRecipe } from "@/server/recipes";
 
-export async function createRecipeAction(formData: FormData) {
-  // TODO: replace with real authenticated user id
-  const userId = "admin-1";
+import { getAuthUser } from "@/server-actions/account";
+
+async function createRecipeAction(formData: FormData) {
+  "use server";
+
+  const user = getAuthUser();
+  if (!user) {
+    throw new Error("User must be authenticated to create a recipe.");
+  }
+  const userId = (await user).id;
 
   const title = formData.get("title")?.toString().trim() ?? "";
   const description = formData.get("description")?.toString().trim() || null;
@@ -30,3 +37,5 @@ export async function createRecipeAction(formData: FormData) {
 
   redirect("/recipes");
 }
+
+export { createRecipeAction };
