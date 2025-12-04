@@ -3,12 +3,16 @@ import { createRecipe } from "@/server/recipes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { getAuthUser } from "@/server-actions/account";
 
 async function createRecipeAction(formData: FormData) {
   "use server";
 
-  // TODO: replace with real authenticated user id
-  const userId = "admin-1";
+  const user = getAuthUser();
+  if (!user) {
+    throw new Error("User must be authenticated to create a recipe.");
+  }
+  const userId = (await user).id;
 
   const title = formData.get("title")?.toString().trim() ?? "";
   const description = formData.get("description")?.toString().trim() || null;

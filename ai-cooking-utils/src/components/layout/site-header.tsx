@@ -1,3 +1,5 @@
+// src/components/layout/site-header.tsx
+
 "use client";
 
 import Link from "next/link";
@@ -5,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { useSession, signOut } from "next-auth/react"; // Import useSession and signOut
 
 const navItems = [
   { href: "/meal-plan", label: "Meal plan" },
@@ -14,6 +17,7 @@ const navItems = [
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur">
@@ -47,14 +51,30 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="hidden md:inline-flex">
-            Log in
-          </Button>
-          {/* TODO replace with user image */}
-          <Avatar className="h-8 w-8">
-            <AvatarImage src="" alt="User avatar" />
-            <AvatarFallback>U</AvatarFallback>
-          </Avatar>
+          {session ? (
+            <>
+              <span className="text-sm">{session.user?.name}</span>
+              {/* Display user avatar */}
+              <Avatar className="h-8 w-8">
+                <AvatarImage
+                  src={session.user?.image || ""}
+                  alt="User avatar"
+                />
+                <AvatarFallback>U</AvatarFallback>
+              </Avatar>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => signOut({ callbackUrl: "/" })}
+              >
+                Log out
+              </Button>
+            </>
+          ) : (
+            <Button variant="outline" size="sm">
+              <Link href="/api/auth/signin">Log in</Link>
+            </Button>
+          )}
         </div>
       </div>
     </header>
