@@ -10,7 +10,12 @@ import { updateUserProfileAction } from "@/server-actions/account";
 export function NewProfileForm({
   user,
 }: {
-  user: { id: string; name: string; email: string; image?: string | null };
+  user: {
+    id: string;
+    name?: string | undefined | null;
+    email: string;
+    image?: string | null;
+  };
 }) {
   const [name, setName] = useState(user.name ?? "");
   const [imageUrl, setImageUrl] = useState(user.image || "");

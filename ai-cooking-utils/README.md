@@ -22,7 +22,12 @@ cookAID is a web app that helps users plan and manage meals by providing recipes
 1. Clone the repository: `git clone https://github.com/TheRikej/AI-cooking-utils.git`
 2. Install dependencies: `npm install`
 3. Run the development server: `npm run dev`
-4. Seed the database : `npm run seed`
+4. Add this to your .env file:
+   TURSO_DATABASE_URL= http://127.0.0.1:8080
+   AUTH_TOKEN="randomtokens"
+
+5. Run database: turso dev --db-file dev.db
+6. Seed the database : `npm run seed`
 
 ## Getting Started
 
