@@ -9,50 +9,22 @@ interface AIResponse {
   error?: string;
 }
 
-export class AIService {
-  static async generateDescription(prompt: string): Promise<string> {
-    try {
-      const response = await fetch('/api/ai/generate-description', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ prompt }),
-      });
+async function generateRecipe(prompt: string): Promise<AIResponse['recipe']> {
+  const response = await fetch('/api/ai/generate-description', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ prompt }),
+  });
 
-      const data: AIResponse = await response.json();
+  const data: AIResponse = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to generate description');
-      }
-
-      return data.content;
-    } catch (error) {
-      console.error('Error generating AI description:', error);
-      throw new Error('Failed to generate description. Please try again.');
-    }
+  if (!response.ok) {
+    throw new Error(data.error || 'Failed to generate recipe');
   }
 
-  static async generateRecipe(prompt: string): Promise<AIResponse['recipe']> {
-    try {
-      const response = await fetch('/api/ai/generate-description', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ prompt }),
-      });
+  return data.recipe;
 
-      const data: AIResponse = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to generate recipe');
-      }
-
-      return data.recipe;
-    } catch (error) {
-      console.error('Error generating AI recipe:', error);
-      throw new Error('Failed to generate recipe. Please try again.');
-    }
   }
-}
+export { generateRecipe };

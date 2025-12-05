@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { AIService } from '@/services/aiService';
+import { generateRecipe } from '@/services/aiService';
 
 interface RecipeData {
   title: string;
@@ -32,7 +32,7 @@ export default function AIDescriptionDialog({
     setError(null);
 
     try {
-      const recipe = await AIService.generateRecipe(prompt);
+      const recipe = await generateRecipe(prompt);
       onGenerate(recipe);
       onClose();
       setPrompt('');

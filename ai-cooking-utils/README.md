@@ -29,6 +29,12 @@ cookAID is a web app that helps users plan and manage meals by providing recipes
 5. Run database: turso dev --db-file dev.db
 6. Seed the database : `npm run seed`
 
+## AI features
+
+To be able to benefit from the AI features, add
+`HUGGINGFACE_API_KEY=your_key` to your .env file.
+You can get your api key on https://huggingface.co/
+
 ## Getting Started
 
 First, run the development server:
