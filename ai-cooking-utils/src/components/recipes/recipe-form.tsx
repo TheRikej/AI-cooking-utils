@@ -3,33 +3,39 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import AIDescriptionDialog from "@/components/AIDescriptionDialog";
 import { Sparkles } from "lucide-react";
-import { createRecipeAction } from "./actions";
 
 interface RecipeData {
   title: string;
-  description: string;
-  ingredients: string;
+  description: string | null;
+  ingredients: string | null;
   instructions: string;
 }
 
-export function NewRecipeForm() {
+type RecipeFormProps = {
+  action: (formData: FormData) => Promise<void>;
+  submitButtonText: string;
+  enableAI: boolean;
+  recipe?: RecipeData;
+}
+
+export function RecipeForm({ action, submitButtonText, enableAI, recipe }: RecipeFormProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const titleRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
   const ingredientsRef = useRef<HTMLTextAreaElement>(null);
   const instructionsRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleAIGenerate = (recipe: RecipeData) => {
+  const updateRecipeData = (recipe: RecipeData) => {
     if (titleRef.current) {
       titleRef.current.value = recipe.title;
     }
-    if (descriptionRef.current) {
+    if (descriptionRef.current && recipe.description) {
       descriptionRef.current.value = recipe.description;
     }
-    if (ingredientsRef.current) {
+    if (ingredientsRef.current && recipe.ingredients) {
       ingredientsRef.current.value = recipe.ingredients;
     }
     if (instructionsRef.current) {
@@ -37,15 +43,21 @@ export function NewRecipeForm() {
     }
   };
 
+  useEffect(() => {
+    if (recipe) {
+      updateRecipeData(recipe);
+    }
+  }, [recipe]);
+
   return (
     <>
-      <form action={createRecipeAction} className="space-y-5">
+      <form action={action} className="space-y-5">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <label htmlFor="title" className="text-sm font-medium text-foreground">
               Title
             </label>
-            <Button
+            {enableAI && <Button
               type="button"
               variant="outline"
               size="sm"
@@ -54,7 +66,7 @@ export function NewRecipeForm() {
             >
               <Sparkles className="h-4 w-4" />
               Generate Recipe with AI
-            </Button>
+            </Button>}
           </div>
           <Input
             ref={titleRef}
@@ -147,15 +159,15 @@ export function NewRecipeForm() {
           <Button type="button" variant="outline" asChild>
             <a href="/recipes">Cancel</a>
           </Button>
-          <Button type="submit">Save recipe</Button>
+          <Button type="submit">{submitButtonText}</Button>
         </div>
       </form>
 
-      <AIDescriptionDialog
+      {enableAI && <AIDescriptionDialog
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
-        onGenerate={handleAIGenerate}
-      />
+        onGenerate={updateRecipeData}
+      />}
     </>
   );
 }

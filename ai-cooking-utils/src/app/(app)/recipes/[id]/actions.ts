@@ -1,14 +1,14 @@
 import { redirect } from "next/navigation";
-import { createRecipe } from "@/server/recipes";
+import { updateRecipeById } from "@/server/recipes";
 
 import { getAuthUser } from "@/server-actions/account";
 
-async function createRecipeAction(formData: FormData) {
+async function editRecipeAction(formData: FormData) {
   "use server";
 
   const user = getAuthUser();
   if (!user) {
-    throw new Error("User must be authenticated to create a recipe.");
+    throw new Error("User must be authenticated to edit a recipe.");
   }
   const userId = (await user).id;
 
@@ -23,17 +23,18 @@ async function createRecipeAction(formData: FormData) {
     throw new Error("Title, ingredients and instructions are required.");
   }
 
-  await createRecipe({
+  await updateRecipeById({
+    id: 0,
     title,
     description,
     ingredients,
     instructions,
     isPublic,
-    createdById: userId,
     imageUrl,
+    userId,
   });
 
   redirect("/recipes");
 }
 
-export { createRecipeAction };
+export { editRecipeAction };

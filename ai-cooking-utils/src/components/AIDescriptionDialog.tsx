@@ -1,7 +1,16 @@
 'use client';
 
 import { useState } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { generateRecipe } from '@/services/aiService';
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from './ui/button';
+
 
 interface RecipeData {
   title: string;
@@ -55,15 +64,17 @@ export default function AIDescriptionDialog({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-        <h2 className="text-xl font-bold mb-4">Generate Complete Recipe with AI</h2>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <DialogContent className="max-w-md">
+      <DialogHeader>
+        <DialogTitle>Generate Complete Recipe with AI</DialogTitle>
+      </DialogHeader>
         
         <div className="mb-4">
           <label htmlFor="ai-prompt" className="block text-sm font-medium mb-2">
             What recipe would you like to create?
           </label>
-          <textarea
+          <Textarea
             id="ai-prompt"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
@@ -84,14 +95,14 @@ export default function AIDescriptionDialog({
         </div>
 
         <div className="flex justify-end space-x-3">
-          <button
+          <Button
             onClick={handleClose}
-            className="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50"
+            className="px-4 py-2 text-gray-600 bg-white border border-gray-300 rounded hover:bg-gray-100"
             // disabled={isLoading}
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleGenerate}
             disabled={!prompt.trim() || isLoading}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center"
@@ -104,9 +115,9 @@ export default function AIDescriptionDialog({
             ) : (
               'Generate Complete Recipe'
             )}
-          </button>
+          </Button>
         </div>
-      </div>
-    </div>
+    </DialogContent>
+  </Dialog>
   );
 }

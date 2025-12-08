@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { recipes } from "@/db/schema/recipes";
 import type { NewRecipe, Recipe } from "@/db/schema/recipes";
-import { eq, or } from "drizzle-orm";
+import { eq, not, or } from "drizzle-orm";
 import { desc, and } from "drizzle-orm";
 
 export async function createRecipe(input: {
@@ -28,6 +28,34 @@ export async function createRecipe(input: {
 
   return created;
 }
+
+export async function updateRecipeById(input: {
+  id: number;
+  title: string;
+  description: string | null;
+  ingredients: string;
+  instructions: string;
+  isPublic: boolean;
+  imageUrl?: string | null;
+  userId: string;
+}): Promise<Recipe | null> {
+  const [updated] = await db
+    .update(recipes)
+    .set({
+      title: input.title,
+      description: input.description,
+      ingredients: input.ingredients,
+      instructions: input.instructions,
+      isPublic: input.isPublic,
+      imageUrl: input.imageUrl ?? null,
+    })
+    .where(and(eq(recipes.id, input.id),
+      eq(recipes.createdById, input.userId)))
+    .returning();
+
+  return updated || null;
+}
+
 
 export async function deleteRecipeById(id: number): Promise<void> {
   await db.delete(recipes).where(eq(recipes.id, id));
@@ -124,4 +152,21 @@ export async function readRecipes(
     ...row.recipe,
     isFavorite: !!row.favUserId,
   }));
+}
+
+export async function readRecipeById(id: number): Promise<Recipe | null> {
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  if (!userId) {
+    return null;
+  }
+
+  const row = await db
+    .select()
+    .from(recipes)
+    .where(and(eq(recipes.id, id), or(eq(recipes.createdById, userId), (recipes.isPublic))))  
+    .limit(1);
+
+  return row[0] || null;
 }
