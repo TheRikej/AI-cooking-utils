@@ -5,8 +5,18 @@ import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
 
-export default async function RecipesPage() {
-  const recipes = await readRecipes();
+type Filter = "all" | "favorites" | "mine";
+
+export default async function RecipesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ filter?: string }>;
+}) {
+  const resolvedSearchParams = await searchParams;
+
+  const filter = (resolvedSearchParams.filter as Filter) || "all";
+
+  const recipes = await readRecipes(filter);
 
   return (
     <div className="space-y-6">
@@ -19,7 +29,40 @@ export default async function RecipesPage() {
             Browse your AI-generated and custom recipes. You can later filter
             public, private and favorites here.
           </p>
+
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button
+              asChild
+              size="sm"
+              variant={filter === "all" ? "default" : "outline"}
+            >
+              <Link href="/recipes">All</Link>
+            </Button>
+
+            <Button
+              asChild
+              size="sm"
+              variant={filter === "favorites" ? "default" : "outline"}
+            >
+              <Link
+                href={{ pathname: "/recipes", query: { filter: "favorites" } }}
+              >
+                Favorites
+              </Link>
+            </Button>
+
+            <Button
+              asChild
+              size="sm"
+              variant={filter === "mine" ? "default" : "outline"}
+            >
+              <Link href={{ pathname: "/recipes", query: { filter: "mine" } }}>
+                My recipes
+              </Link>
+            </Button>
+          </div>
         </div>
+
         <Button asChild size="lg">
           <Link href="/recipes/new">Add new recipe</Link>
         </Button>
@@ -27,9 +70,9 @@ export default async function RecipesPage() {
 
       {recipes.length === 0 ? (
         <div className="rounded-xl border border-dashed p-6 text-sm text-muted-foreground">
-          You don’t have any recipes yet.{" "}
+          No recipes for this filter yet.{" "}
           <Button asChild variant="link" className="px-1">
-            <Link href="/recipes/new">Create your first recipe.</Link>
+            <Link href="/recipes/new">Create a recipe.</Link>
           </Button>
         </div>
       ) : (
