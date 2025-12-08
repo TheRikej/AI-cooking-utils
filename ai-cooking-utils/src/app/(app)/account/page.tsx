@@ -12,12 +12,17 @@ export default async function AccountPage() {
   }
 
   const newestUser = await getUserProfileAction(authuser.id);
+  if (newestUser === null) {
+    return <div>User profile not found</div>;
+  }
+  newestUser
 
-  const user: User = {
-    id: newestUser?.id,
+  const user: User & {aiContext: string | null, id: string} = {
+    id: newestUser.id,
     name: newestUser?.name ?? "Default Name",
     email: newestUser?.email,
     image: newestUser?.image,
+    aiContext: newestUser?.aiContext ? newestUser.aiContext : "",
   };
 
   return (

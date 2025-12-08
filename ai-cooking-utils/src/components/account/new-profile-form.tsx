@@ -13,19 +13,21 @@ export function NewProfileForm({
   user: {
     id: string;
     name?: string | undefined | null;
-    email: string;
+    email?: string | undefined | null;
     image?: string | null;
+    aiContext?: string | null;
   };
 }) {
   const [name, setName] = useState(user.name ?? "");
   const [imageUrl, setImageUrl] = useState(user.image || "");
+  const [aiContext, setAIContext] = useState(user.aiContext || "");
 
   const router = useRouter();
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    await updateUserProfileAction(user.id, name, imageUrl);
+    await updateUserProfileAction(user.id, name, imageUrl, aiContext);
 
     router.refresh();
   };
@@ -68,6 +70,21 @@ export function NewProfileForm({
           value={imageUrl}
           onChange={(e) => setImageUrl(e.target.value)}
           placeholder="https://example.com/my-avatar.jpg"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="aiContext"
+          className="text-sm font-medium text-foreground"
+        >
+          Diatery preferences
+        </label>
+        <Input
+          id="aiContext"
+          value={aiContext}
+          onChange={(e) => setAIContext(e.target.value)}
+          placeholder="General info about your diatery preferences (used to tailor AI to your needs)"
         />
       </div>
 

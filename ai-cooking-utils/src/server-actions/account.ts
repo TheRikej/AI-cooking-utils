@@ -6,9 +6,10 @@ import { revalidatePath } from "next/cache";
 export async function updateUserProfileAction(
   userId: string,
   name: string,
-  image: string | null
+  image: string | null,
+  AIContext?: string
 ) {
-  await updateUserProfile(userId, { name, image });
+  await updateUserProfile(userId, { name, image, AIContext: AIContext });
 
   const session = await auth();
   if (session?.user) {
@@ -28,6 +29,12 @@ export async function getUserProfileAction(userId: string) {
   const user = await getUserDetails(userId);
 
   return user;
+}
+
+export async function getUserAIContext(userId: string) {
+  const user = await getUserDetails(userId);
+
+  return user?.aiContext ?? null;
 }
 
 export const getAuthUser = async () => {
