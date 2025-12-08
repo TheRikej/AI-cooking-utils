@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
 import { updateUserProfileAction } from "@/server-actions/account";
+import { Textarea } from "../ui/textarea";
 
 export function NewProfileForm({
   user,
@@ -80,7 +81,7 @@ export function NewProfileForm({
         >
           Diatery preferences
         </label>
-        <Input
+        <Textarea
           id="aiContext"
           value={aiContext}
           onChange={(e) => setAIContext(e.target.value)}
