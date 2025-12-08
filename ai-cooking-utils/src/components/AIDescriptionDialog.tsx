@@ -23,6 +23,7 @@ export default function AIDescriptionDialog({
 }: AIRecipeDialogProps) {
   const [prompt, setPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isCanceled, setIsCanceled] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleGenerate = async () => {
@@ -33,6 +34,7 @@ export default function AIDescriptionDialog({
 
     try {
       const recipe = await generateRecipe(prompt);
+      if (isCanceled) return;
       onGenerate(recipe);
       onClose();
       setPrompt('');
@@ -45,6 +47,7 @@ export default function AIDescriptionDialog({
 
   const handleClose = () => {
     setPrompt('');
+    setIsCanceled(true);
     setError(null);
     onClose();
   };
@@ -84,7 +87,7 @@ export default function AIDescriptionDialog({
           <button
             onClick={handleClose}
             className="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50"
-            disabled={isLoading}
+            // disabled={isLoading}
           >
             Cancel
           </button>

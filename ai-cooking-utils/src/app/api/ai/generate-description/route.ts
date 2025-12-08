@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const { prompt } = await request.json();
+    const { prompt, aiContext } = await request.json();
 
     if (!prompt?.trim()) {
       return NextResponse.json(
@@ -19,10 +19,14 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-      messages: [
+        messages: [
           {
             role: "user",
-            content: `Generate recipe in the following JSON format:
+            content: `${
+              aiContext ? "Generate a recipe following the following user's preferences" + aiContext +
+              "\n The generate recipe should be in the following JSON format:"
+              :"Generate recipe in the following JSON format:"
+            }
             {
             "Title": "Recipe Title",
             "Description": "A brief description of the recipe",
@@ -73,6 +77,12 @@ export async function POST(request: NextRequest) {
       if (firstBracket !== -1 && lastBracket !== -1 && lastBracket > firstBracket) {
         jsonData = jsonData.slice(firstBracket, lastBracket + 1);
       }
+      if (jsonData.length = 0) {
+        return NextResponse.json(
+          { error: 'Recipe failed to generate. Please try again.' },
+          { status: 400 }
+        );
+      }
 
       try {
         const parsedRecipe = JSON.parse(jsonData);
@@ -85,7 +95,7 @@ export async function POST(request: NextRequest) {
         console.log('Raw jsonData:', jsonData);
         
         return NextResponse.json(
-          { error: 'Bad input from the user.' },
+          { error: 'Recipe failed to generate. Please try again.' },
           { status: 400 }
         );
       }

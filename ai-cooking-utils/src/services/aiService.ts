@@ -1,3 +1,5 @@
+import { getAuthUser, getUserAIContext } from "@/server-actions/account";
+
 interface AIResponse {
   content: string;
   recipe: {
@@ -9,13 +11,24 @@ interface AIResponse {
   error?: string;
 }
 
-async function generateRecipe(prompt: string): Promise<AIResponse['recipe']> {
+async function generateRecipe(
+  prompt: string,
+): Promise<AIResponse['recipe']> {
+  const authuser = await getAuthUser();
+
+  if (!authuser) {
+    throw new Error('User not authenticated');
+  }
+
+  const aiContext = await getUserAIContext(authuser.id);
+
+
   const response = await fetch('/api/ai/generate-description', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ prompt }),
+    body: JSON.stringify({ prompt, aiContext }),
   });
 
   const data: AIResponse = await response.json();
@@ -25,6 +38,5 @@ async function generateRecipe(prompt: string): Promise<AIResponse['recipe']> {
   }
 
   return data.recipe;
-
-  }
+}
 export { generateRecipe };

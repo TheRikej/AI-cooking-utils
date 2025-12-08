@@ -15,10 +15,18 @@ export async function getUserDetails(userId: string): Promise<User | null> {
 
 export async function updateUserProfile(
   userId: string,
-  input: { name: string; image?: string | null }
+  input: { 
+    name: string; 
+    image?: string | null;
+    AIContext?: string;
+  }
 ): Promise<void> {
   await db
     .update(users)
-    .set({ name: input.name, image: input.image ?? null })
+    .set({ 
+      name: input.name, 
+      image: input.image ?? null,
+      aiContext: input.AIContext,
+    })
     .where(eq(users.id, userId));
 }
