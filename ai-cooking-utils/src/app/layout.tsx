@@ -9,7 +9,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className="overflow-y-scroll">
       <body className="min-h-screen bg-background text-foreground antialiased">
         <SessionProvider>
           <div className="flex min-h-screen flex-col">
