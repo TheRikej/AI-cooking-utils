@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
 import { MealPlanCalendar, getMonday, formatWeekRange } from "@/components/meal-plan/meal-plan-calendar";
 import { AIMealPlanDialog } from "@/components/meal-plan/ai-meal-plan-dialog";
 import type { MealPlanEntryWithRecipe } from "@/server/mealPlan";
+import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
 
 export default function MealPlanPage() {
   const [isAIDialogOpen, setIsAIDialogOpen] = useState(false);
@@ -14,6 +16,12 @@ export default function MealPlanPage() {
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() =>
     getMonday(new Date())
   );
+
+    const session = useSession();
+  
+    if (session.status !== "authenticated") {
+      redirect("/api/auth/signin");
+    }
 
   useEffect(() => {
     fetchMealPlanEntries();

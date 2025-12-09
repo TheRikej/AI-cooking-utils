@@ -15,7 +15,7 @@ export default function RootLayout({
           <div className="flex min-h-screen flex-col">
             <SiteHeader />
 
-            <main className="mx-auto flex w-full max-w-5xl flex-1 px-4 pb-10 pt-6">
+            <main className="mx-auto w-full max-w-5xl px-4 pb-10 pt-6">
               {children} {/* This will render the page content */}
             </main>
 
