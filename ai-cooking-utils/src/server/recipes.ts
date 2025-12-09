@@ -39,6 +39,10 @@ export async function updateRecipeById(input: {
   imageUrl?: string | null;
   userId: string;
 }): Promise<Recipe | null> {
+  if (!await checkUserEditRights(input.id)) {
+    throw new Error("User does not have rights to edit this recipe.");
+  }
+
   const [updated] = await db
     .update(recipes)
     .set({
@@ -58,8 +62,14 @@ export async function updateRecipeById(input: {
 
 
 export async function deleteRecipeById(id: number): Promise<void> {
-  await db.delete(recipes).where(eq(recipes.id, id));
+  if (await checkUserEditRights(id)) {
+    await db.delete(recipes).where(eq(recipes.id, id));
+  }
+  else {
+    throw new Error("User does not have rights to delete this recipe.");
+  }
 }
+
 export type RecipeWithFavorite = Recipe & {
   isFavorite: boolean;
 };
@@ -169,4 +179,20 @@ export async function readRecipeById(id: number): Promise<Recipe | null> {
     .limit(1);
 
   return row[0] || null;
+}
+
+export async function checkUserEditRights(recipeId: number): Promise<boolean> {
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) {
+    return false;
+  }
+
+  const row = await db
+    .select()
+    .from(recipes)
+    .where(and(eq(recipes.id, recipeId), eq(recipes.createdById, userId)))
+    .limit(1);
+
+  return row.length > 0;
 }
