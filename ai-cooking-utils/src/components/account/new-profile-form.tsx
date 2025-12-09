@@ -23,14 +23,29 @@ export function NewProfileForm({
   const [imageUrl, setImageUrl] = useState(user.image || "");
   const [aiContext, setAIContext] = useState(user.aiContext || "");
 
+  const [status, setStatus] = useState<"idle" | "saving" | "success" | "error">(
+    "idle"
+  );
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const router = useRouter();
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    await updateUserProfileAction(user.id, name, imageUrl, aiContext);
+    setStatus("saving");
+    setErrorMessage(null);
 
-    router.refresh();
+    try {
+      await updateUserProfileAction(user.id, name, imageUrl, aiContext);
+
+      setStatus("success");
+      router.refresh();
+    } catch (err) {
+      console.error(err);
+      setStatus("error");
+      setErrorMessage("Something went wrong while saving your profile.");
+    }
   };
 
   return (
@@ -89,11 +104,31 @@ export function NewProfileForm({
         />
       </div>
 
+      {status === "success" && (
+        <p className="text-sm text-green-600">Profile saved successfully.</p>
+      )}
+      {status === "error" && (
+        <p className="text-sm text-red-600">{errorMessage}</p>
+      )}
+
       <div className="flex justify-end gap-3 pt-2">
-        <Button type="button" variant="outline">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => {
+            // Optional: reset to original values
+            setName(user.name ?? "");
+            setImageUrl(user.image || "");
+            setAIContext(user.aiContext || "");
+            setStatus("idle");
+            setErrorMessage(null);
+          }}
+        >
           Cancel
         </Button>
-        <Button type="submit">Save Changes</Button>
+        <Button type="submit" disabled={status === "saving"}>
+          {status === "saving" ? "Saving..." : "Save Changes"}
+        </Button>
       </div>
     </form>
   );
