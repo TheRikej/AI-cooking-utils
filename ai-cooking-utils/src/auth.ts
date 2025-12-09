@@ -2,17 +2,25 @@ import NextAuth, { NextAuthConfig } from "next-auth";
 import GitHub from "next-auth/providers/github";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "./db";
+import { eq } from "drizzle-orm";
+import { users } from "./db/schema/users";
 
 export const authOptions = {
   providers: [GitHub],
-  adapter: DrizzleAdapter(db), // Optional: Use Drizzle ORM for your DB management (if you need database sessions)
+  adapter: DrizzleAdapter(db),
 
   callbacks: {
     session: async ({ session, token }) => {
-      if (token) {
-        session.user.id = token.id as string;
-        session.user.email = token.email as string;
-        session.user.name = token.name as string;
+      if (!session.user || !token.sub) return session;
+
+      const dbUser = await db.query.users.findFirst({
+        where: eq(users.id, token.sub),
+      });
+
+      if (dbUser) {
+        session.user.id = dbUser.id;
+        session.user.name = dbUser.name;
+        session.user.image = dbUser.image;
       }
       return session;
     },

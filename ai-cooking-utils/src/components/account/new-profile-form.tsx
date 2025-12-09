@@ -7,6 +7,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
 import { updateUserProfileAction } from "@/server-actions/account";
 import { Textarea } from "../ui/textarea";
+import { useSession } from "next-auth/react";
 
 export function NewProfileForm({
   user,
@@ -29,6 +30,7 @@ export function NewProfileForm({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const router = useRouter();
+  const { data: session, update } = useSession();
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,6 +40,14 @@ export function NewProfileForm({
 
     try {
       await updateUserProfileAction(user.id, name, imageUrl, aiContext);
+
+      await update({
+        user: {
+          ...(session?.user ?? {}),
+          name,
+          image: imageUrl || null,
+        },
+      });
 
       setStatus("success");
       router.refresh();
@@ -116,7 +126,6 @@ export function NewProfileForm({
           type="button"
           variant="outline"
           onClick={() => {
-            // Optional: reset to original values
             setName(user.name ?? "");
             setImageUrl(user.image || "");
             setAIContext(user.aiContext || "");
