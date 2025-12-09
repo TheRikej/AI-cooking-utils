@@ -12,14 +12,16 @@ import Link from "next/link";
 import { deleteRecipeAction } from "@/server-actions/recipes";
 import { toggleFavoriteAction } from "@/server-actions/favorites";
 import { Trash2, Star, StarOff } from "lucide-react";
+import { checkUserEditRights } from "@/server/recipes";
 
 type RecipeCardProps = {
   recipe: Recipe & { isFavorite?: boolean };
 };
 
-export function RecipeCard({ recipe }: RecipeCardProps) {
+export async function RecipeCard({ recipe }: RecipeCardProps) {
   const deleteWithId = deleteRecipeAction.bind(null, recipe.id);
   const toggleFavorite = toggleFavoriteAction.bind(null, recipe.id);
+  const hasEditRights = await checkUserEditRights(recipe.id);
 
   return (
     <Card className="flex h-full flex-col relative">
@@ -30,9 +32,7 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
           </CardTitle>
 
           <div className="flex items-center gap-2">
-            <Badge variant={recipe.isPublic ? "default" : "outline"}>
-              {recipe.isPublic ? "Public" : "Private"}
-            </Badge>
+            
 
             <form action={toggleFavorite}>
               <Button
@@ -49,7 +49,7 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
                 )}
               </Button>
             </form>
-
+            {hasEditRights &&
             <form action={deleteWithId}>
               <Button
                 type="submit"
@@ -60,7 +60,7 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
-            </form>
+            </form>}
           </div>
         </div>
 
@@ -72,7 +72,9 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
       </CardHeader>
 
       <CardContent className="mt-auto flex items-center justify-between pt-0 text-xs text-muted-foreground">
-        <span>Recipe #{recipe.id}</span>
+        <Badge variant={recipe.isPublic ? "default" : "outline"}>
+              {recipe.isPublic ? "Public" : "Private"}
+        </Badge>
         <Button asChild size="sm" variant="outline">
           <Link href={`/recipes/${recipe.id}`}>Open</Link>
         </Button>
