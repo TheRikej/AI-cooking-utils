@@ -15,9 +15,8 @@ export default async function AccountPage() {
   if (newestUser === null) {
     return <div>User profile not found</div>;
   }
-  newestUser
 
-  const user: User & {aiContext: string | null, id: string} = {
+  const user: User & { aiContext: string | null; id: string } = {
     id: newestUser.id,
     name: newestUser?.name ?? "Default Name",
     email: newestUser?.email,

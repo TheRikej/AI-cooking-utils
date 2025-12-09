@@ -7,20 +7,14 @@ export async function updateUserProfileAction(
   userId: string,
   name: string,
   image: string | null,
-  AIContext?: string
+  aiContext?: string
 ) {
-  await updateUserProfile(userId, { name, image, AIContext: AIContext });
+  await updateUserProfile(userId, { name, image, aiContext });
 
-  const session = await auth();
-  if (session?.user) {
-    session.user.name = name;
-    session.user.image = image ?? null;
-  }
-  console.log(`User updated successfully: username=${name}, image=${image}`);
+  await auth();
 
   revalidatePath("/account");
 }
-
 import { getUserDetails } from "@/server/users";
 import { auth, signOut } from "@/auth";
 import { redirect } from "next/navigation";
