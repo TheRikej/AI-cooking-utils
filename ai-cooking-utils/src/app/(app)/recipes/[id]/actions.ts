@@ -3,7 +3,7 @@ import { updateRecipeById } from "@/server/recipes";
 
 import { getAuthUser } from "@/server-actions/account";
 
-async function editRecipeAction(formData: FormData) {
+async function editRecipeAction(recipeId: number, formData: FormData) {
   "use server";
 
   const user = getAuthUser();
@@ -24,7 +24,7 @@ async function editRecipeAction(formData: FormData) {
   }
 
   await updateRecipeById({
-    id: 0,
+    id: recipeId,
     title,
     description,
     ingredients,

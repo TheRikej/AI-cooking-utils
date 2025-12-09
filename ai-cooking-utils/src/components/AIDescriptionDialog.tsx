@@ -17,6 +17,7 @@ interface RecipeData {
   description: string;
   ingredients: string;
   instructions: string;
+  isPublic: boolean;
 }
 
 interface AIRecipeDialogProps {
@@ -44,7 +45,7 @@ export default function AIDescriptionDialog({
     try {
       const recipe = await generateRecipe(prompt);
       if (isCanceled) return;
-      onGenerate(recipe);
+      onGenerate({...recipe, isPublic: false});
       onClose();
       setPrompt('');
     } catch (err) {

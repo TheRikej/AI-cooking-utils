@@ -12,11 +12,12 @@ interface RecipeData {
   description: string | null;
   ingredients: string | null;
   instructions: string;
+  isPublic: boolean;
 }
 
 type RecipeFormProps = {
   action: (formData: FormData) => Promise<void>;
-  submitButtonText: string;
+  submitButtonText?: string;
   enableAI: boolean;
   recipe?: RecipeData;
 }
@@ -148,7 +149,7 @@ export function RecipeForm({ action, submitButtonText, enableAI, recipe }: Recip
             id="isPublic"
             name="isPublic"
             type="checkbox"
-            defaultChecked
+            defaultChecked={recipe?.isPublic}
             className="h-4 w-4 rounded border-muted bg-background"
           />
           <label htmlFor="isPublic" className="text-sm text-foreground">
@@ -159,7 +160,7 @@ export function RecipeForm({ action, submitButtonText, enableAI, recipe }: Recip
           <Button type="button" variant="outline" asChild>
             <a href="/recipes">Cancel</a>
           </Button>
-          <Button type="submit">{submitButtonText}</Button>
+          {submitButtonText && <Button type="submit">{submitButtonText}</Button>}
         </div>
       </form>
 

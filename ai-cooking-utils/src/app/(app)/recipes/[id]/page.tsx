@@ -1,6 +1,6 @@
 import { RecipeForm } from "@/components/recipes/recipe-form";
 import { editRecipeAction } from "./actions";
-import { readRecipeById } from "@/server/recipes";
+import { checkUserEditRights, readRecipeById } from "@/server/recipes";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +14,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
   const {id: recipeId} = await params;
 
   const recipe = await readRecipeById(recipeId);
+  const editRights = await checkUserEditRights(recipeId);
 
   if (!recipe) {
     return <div className="mx-auto w-full max-w-2xl space-y-6">
@@ -31,7 +32,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
         </h1>
       </header>
 
-      <RecipeForm action={editRecipeAction} submitButtonText="Edit Recipe" enableAI={false} recipe={recipe}/>
+      <RecipeForm action={editRecipeAction.bind(undefined, recipeId)} submitButtonText={editRights ? "Edit Recipe": ""} enableAI={false} recipe={recipe}/>
     </div>
   );
 }
