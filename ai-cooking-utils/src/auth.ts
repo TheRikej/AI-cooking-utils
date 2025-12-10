@@ -21,6 +21,7 @@ export const authOptions = {
         session.user.id = dbUser.id;
         session.user.name = dbUser.name;
         session.user.image = dbUser.image;
+        session.user.aiContext = dbUser.aiContext;
       }
       return session;
     },

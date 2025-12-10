@@ -9,6 +9,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await auth();
     const userId = session?.user?.id;
+    const aiContext = session?.user?.aiContext || "";
 
     if (!userId) {
       return NextResponse.json(
@@ -48,7 +49,8 @@ export async function POST(request: NextRequest) {
 
     const totalMeals = dates.length * MEAL_TYPES.length;
 
-    const prompt = `Generate a ${daysDiff + 1}-day meal plan with ${totalMeals} recipes (${MEAL_TYPES.join(", ")} for each day).
+    const prompt = `${aiContext ? "Here are genereal preferences of a user" + aiContext : ""}
+    Generate a ${daysDiff + 1}-day meal plan with ${totalMeals} recipes (${MEAL_TYPES.join(", ")} for each day).
 ${preferences ? `Dietary preferences: ${preferences}` : ""}
 
 Return ONLY a JSON array with exactly ${totalMeals} recipes in this format:
