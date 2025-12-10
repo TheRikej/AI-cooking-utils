@@ -1,8 +1,41 @@
-import { SessionProvider } from "next-auth/react"; // Import SessionProvider
-import { SiteHeader } from "@/components/layout/site-header"; // Your header component
-import "./globals.css"; // Global styles
+import { SessionProvider } from "next-auth/react";
+import { SiteHeader } from "@/components/layout/site-header";
+import "./globals.css";
 
-// Root layout
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: {
+    template: "%s | CookAid",
+    default: "CookAid - Your Recipe Companion",
+  },
+  description:
+    "CookAid helps you find, create, and share delicious recipes with ease.",
+  keywords: "recipes, cooking, food, kitchen, AI, meal planning, cookbook",
+  openGraph: {
+    title: "CookAid - Your Recipe Companion",
+    description: "CookAid helps you find, create, and share delicious recipes.",
+    url: "https://cookaid.vercel.app",
+    siteName: "CookAid",
+    images: [
+      {
+        url: "https://cookaid.vercel.app/plate.jpg",
+        width: 1200,
+        height: 630,
+        alt: "CookAid Logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@CookAid",
+    creator: "@CookAid",
+    title: "CookAid - Your Recipe Companion",
+    description: "CookAid helps you find, create, and share delicious recipes.",
+    images: ["https://cookaid.vercel.app/plate.jpg"],
+  },
+};
+
 export default function RootLayout({
   children,
 }: {
