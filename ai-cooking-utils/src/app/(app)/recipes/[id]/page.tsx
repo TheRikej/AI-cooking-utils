@@ -4,37 +4,37 @@ import { checkUserEditRights, readRecipeById } from "@/server/recipes";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: { params: { id: number } }) {
-  const recipe = await readRecipeById(params.id);
-  if (!recipe) {
-    return {
-      title: "Recipe Not Found",
-    };
-  }
+// export async function generateMetadata({ params }: { params: { id: number } }) {
+//   const recipe = await readRecipeById(params.id);
+//   if (!recipe) {
+//     return {
+//       title: "Recipe Not Found",
+//     };
+//   }
 
-  return {
-    title: recipe.title,
-    description: recipe.description,
-    openGraph: {
-      title: recipe.title,
-      description: recipe.description,
-      images: [
-        {
-          url: recipe.imageUrl,
-          width: 1200,
-          height: 630,
-          alt: recipe.title,
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: recipe.title,
-      description: recipe.description,
-      image: recipe.imageUrl,
-    },
-  };
-}
+//   return {
+//     title: recipe.title,
+//     description: recipe.description,
+//     openGraph: {
+//       title: recipe.title,
+//       description: recipe.description,
+//       images: [
+//         {
+//           url: recipe.imageUrl,
+//           width: 1200,
+//           height: 630,
+//           alt: recipe.title,
+//         },
+//       ],
+//     },
+//     twitter: {
+//       card: "summary_large_image",
+//       title: recipe.title,
+//       description: recipe.description,
+//       image: recipe.imageUrl,
+//     },
+//   };
+// }
 
 interface RecipePageProps {
   params: {
