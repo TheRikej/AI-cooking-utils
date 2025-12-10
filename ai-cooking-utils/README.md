@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-cookAID is a web app that helps users plan and manage meals by providing recipes and shopping lists.
+cookAID is a web app that helps users plan and manage meals by providing recipes and helping them plan them.
 
 ## Features
 
