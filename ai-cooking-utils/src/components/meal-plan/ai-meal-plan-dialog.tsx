@@ -10,23 +10,23 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useGenerateAIMealPlan } from "@/hooks/use-ai-meal-plan";
 
 interface AIMealPlanDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onGenerate: () => void;
 }
 
 export function AIMealPlanDialog({
   isOpen,
   onClose,
-  onGenerate,
 }: AIMealPlanDialogProps) {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [preferences, setPreferences] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const generateMealPlan = useGenerateAIMealPlan();
 
   const handleGenerate = async () => {
     if (!startDate || !endDate) {
@@ -51,34 +51,19 @@ export function AIMealPlanDialog({
       return;
     }
 
-    setIsLoading(true);
     setError(null);
 
     try {
-      const response = await fetch("/api/ai/generate-meal-plan", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          startDate,
-          endDate,
-          preferences: preferences || "balanced and healthy meals",
-        }),
+      await generateMealPlan.mutateAsync({
+        startDate,
+        endDate,
+        preferences: preferences || "balanced and healthy meals",
       });
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to generate meal plan");
-      }
-
-      onGenerate();
       onClose();
       resetForm();
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -91,6 +76,7 @@ export function AIMealPlanDialog({
 
   const handleClose = () => {
     resetForm();
+    generateMealPlan.reset();
     onClose();
   };
 
@@ -114,7 +100,7 @@ export function AIMealPlanDialog({
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              disabled={isLoading}
+              disabled={generateMealPlan.isPending}
             />
           </div>
 
@@ -127,7 +113,7 @@ export function AIMealPlanDialog({
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              disabled={isLoading}
+              disabled={generateMealPlan.isPending}
               min={startDate}
             />
           </div>
@@ -144,7 +130,7 @@ export function AIMealPlanDialog({
               value={preferences}
               onChange={(e) => setPreferences(e.target.value)}
               placeholder="e.g., vegetarian, low carb, gluten-free, high protein..."
-              disabled={isLoading}
+              disabled={generateMealPlan.isPending}
               className="min-h-[80px]"
             />
           </div>
@@ -164,15 +150,15 @@ export function AIMealPlanDialog({
             <Button
               variant="outline"
               onClick={handleClose}
-              disabled={isLoading}
+              disabled={generateMealPlan.isPending}
             >
               Cancel
             </Button>
             <Button
               onClick={handleGenerate}
-              disabled={!startDate || !endDate || isLoading}
+              disabled={!startDate || !endDate || generateMealPlan.isPending}
             >
-              {isLoading ? (
+              {generateMealPlan.isPending ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                   Generating...

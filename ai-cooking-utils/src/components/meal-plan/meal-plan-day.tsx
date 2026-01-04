@@ -8,10 +8,9 @@ interface MealPlanDayProps {
   date: Date;
   entries: MealPlanEntryWithRecipe[];
   mealTypes: string[];
-  onMutate?: () => void;
 }
 
-export function MealPlanDay({ date, entries, mealTypes, onMutate }: MealPlanDayProps) {
+export function MealPlanDay({ date, entries, mealTypes }: MealPlanDayProps) {
   const isToday =
     new Date().toDateString() === date.toDateString();
 
@@ -44,7 +43,6 @@ export function MealPlanDay({ date, entries, mealTypes, onMutate }: MealPlanDayP
               date={dateStr}
               mealType={mealType}
               entry={entry}
-              onMutate={onMutate}
             />
           );
         })}

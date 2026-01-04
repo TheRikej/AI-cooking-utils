@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,8 +9,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { Recipe } from "@/db/schema/recipes";
 import { Search } from "lucide-react";
+import { useRecipes } from "@/hooks/use-recipes";
 
 interface RecipeSelectorDialogProps {
   isOpen: boolean;
@@ -25,47 +25,27 @@ export function RecipeSelectorDialog({
   onSelect,
   currentRecipeId,
 }: RecipeSelectorDialogProps) {
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const { data: recipes = [], isLoading } = useRecipes(isOpen);
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchRecipes();
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
+  const filteredRecipes = useMemo(() => {
     if (searchQuery.trim() === "") {
-      setFilteredRecipes(recipes);
-    } else {
-      const query = searchQuery.toLowerCase();
-      setFilteredRecipes(
-        recipes.filter(
-          (recipe) =>
-            recipe.title.toLowerCase().includes(query) ||
-            recipe.description?.toLowerCase().includes(query)
-        )
-      );
+      return recipes;
     }
+
+    const query = searchQuery.toLowerCase();
+    return recipes.filter(
+      (recipe) =>
+        recipe.title.toLowerCase().includes(query) ||
+        recipe.description?.toLowerCase().includes(query)
+    );
   }, [searchQuery, recipes]);
 
-  const fetchRecipes = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch("/api/recipes");
-      if (response.ok) {
-        const data = await response.json();
-        setRecipes(data);
-        setFilteredRecipes(data);
-      }
-    } catch (error) {
-      console.error("Error fetching recipes:", error);
-    } finally {
-      setIsLoading(false);
+  useEffect(() => {
+    if (!isOpen) {
+      setSearchQuery("");
     }
-  };
+  }, [isOpen]);
 
   const handleSelect = (recipeId: number) => {
     onSelect(recipeId);
