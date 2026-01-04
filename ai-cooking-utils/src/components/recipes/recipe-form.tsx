@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useState, useRef, useEffect } from "react";
 import AIDescriptionDialog from "@/components/AIDescriptionDialog";
 import { Sparkles } from "lucide-react";
+import { flushSync } from 'react-dom';
 
 interface RecipeData {
   title: string;
@@ -24,6 +25,7 @@ type RecipeFormProps = {
 
 export function RecipeForm({ action, submitButtonText, enableAI, recipe }: RecipeFormProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const titleRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
   const ingredientsRef = useRef<HTMLTextAreaElement>(null);
@@ -50,9 +52,16 @@ export function RecipeForm({ action, submitButtonText, enableAI, recipe }: Recip
     }
   }, [recipe]);
 
+  const handleSubmit = async (formData: FormData) => {
+    if (isSubmitting) return;
+
+    flushSync( () => setIsSubmitting(true));
+    await action(formData);
+  };
+
   return (
     <>
-      <form action={action} className="space-y-5">
+      <form action={handleSubmit} className="space-y-5">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <label htmlFor="title" className="text-sm font-medium text-foreground">
@@ -160,7 +169,7 @@ export function RecipeForm({ action, submitButtonText, enableAI, recipe }: Recip
           <Button type="button" variant="outline" asChild>
             <a href="/recipes">Cancel</a>
           </Button>
-          {submitButtonText && <Button type="submit">{submitButtonText}</Button>}
+          {submitButtonText && <Button type="submit" disabled={isSubmitting}>{submitButtonText}</Button>}
         </div>
       </form>
 
