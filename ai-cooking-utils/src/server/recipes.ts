@@ -166,11 +166,7 @@ export async function readRecipes(
 
 export async function readRecipeById(id: number): Promise<Recipe | null> {
   const session = await auth();
-  const userId = session?.user?.id;
-
-  if (!userId) {
-    return null;
-  }
+  const userId = session?.user ? session.user.id: "";
 
   const row = await db
     .select()
