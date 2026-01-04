@@ -1,62 +1,32 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
 import { MealPlanCalendar, getMonday, formatWeekRange } from "@/components/meal-plan/meal-plan-calendar";
 import { AIMealPlanDialog } from "@/components/meal-plan/ai-meal-plan-dialog";
-import type { MealPlanEntryWithRecipe } from "@/server/mealPlan";
-import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { useMealPlan } from "@/hooks/use-meal-plan";
 
 export default function MealPlanPage() {
   const [isAIDialogOpen, setIsAIDialogOpen] = useState(false);
-  const [entries, setEntries] = useState<MealPlanEntryWithRecipe[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() =>
     getMonday(new Date())
   );
 
-    const session = useSession();
-  
-    if (session.status !== "authenticated") {
-      redirect("/api/auth/signin");
-    }
+  const { startDate, endDate } = useMemo(() => {
+    const today = new Date();
+    const fourWeeksAgo = new Date(today);
+    fourWeeksAgo.setDate(today.getDate() - 28);
+    const fourWeeksAhead = new Date(today);
+    fourWeeksAhead.setDate(today.getDate() + 28);
 
-  useEffect(() => {
-    fetchMealPlanEntries();
+    return {
+      startDate: fourWeeksAgo.toISOString().split("T")[0],
+      endDate: fourWeeksAhead.toISOString().split("T")[0],
+    };
   }, []);
 
-  const fetchMealPlanEntries = async () => {
-    setIsLoading(true);
-    try {
-      const today = new Date();
-      const fourWeeksAgo = new Date(today);
-      fourWeeksAgo.setDate(today.getDate() - 28);
-      const fourWeeksAhead = new Date(today);
-      fourWeeksAhead.setDate(today.getDate() + 28);
-
-      const startDate = fourWeeksAgo.toISOString().split("T")[0];
-      const endDate = fourWeeksAhead.toISOString().split("T")[0];
-
-      const response = await fetch(
-        `/api/meal-plan?startDate=${startDate}&endDate=${endDate}`
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        setEntries(data);
-      }
-    } catch (error) {
-      console.error("Error fetching meal plan entries:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleAIGenerate = () => {
-    fetchMealPlanEntries();
-  };
+  const { data: entries = [], isLoading } = useMealPlan({ startDate, endDate });
 
   const goToPreviousWeek = () => {
     const newDate = new Date(currentWeekStart);
@@ -135,14 +105,12 @@ export default function MealPlanPage() {
 
       <MealPlanCalendar
         initialEntries={entries}
-        onMutate={fetchMealPlanEntries}
         currentWeekStart={currentWeekStart}
       />
 
       <AIMealPlanDialog
         isOpen={isAIDialogOpen}
         onClose={() => setIsAIDialogOpen(false)}
-        onGenerate={handleAIGenerate}
       />
     </div>
   );

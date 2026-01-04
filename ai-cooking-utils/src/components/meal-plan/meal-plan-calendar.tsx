@@ -5,7 +5,6 @@ import type { MealPlanEntryWithRecipe } from "@/server/mealPlan";
 
 interface MealPlanCalendarProps {
   initialEntries: MealPlanEntryWithRecipe[];
-  onMutate?: () => void;
   currentWeekStart: Date;
 }
 
@@ -25,7 +24,7 @@ function formatDate(date: Date): string {
   return date.toISOString().split("T")[0];
 }
 
-export function MealPlanCalendar({ initialEntries, onMutate, currentWeekStart }: MealPlanCalendarProps) {
+export function MealPlanCalendar({ initialEntries, currentWeekStart }: MealPlanCalendarProps) {
   const weekDates = getWeekDates(currentWeekStart);
 
   const getEntriesForDate = (date: Date) => {
@@ -43,7 +42,6 @@ export function MealPlanCalendar({ initialEntries, onMutate, currentWeekStart }:
             date={date}
             entries={getEntriesForDate(date)}
             mealTypes={MEAL_TYPES}
-            onMutate={onMutate}
           />
         ))}
     </div>

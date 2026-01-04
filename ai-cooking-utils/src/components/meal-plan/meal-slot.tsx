@@ -6,50 +6,47 @@ import { Plus, X } from "lucide-react";
 import type { MealPlanEntryWithRecipe } from "@/server/mealPlan";
 import { RecipeSelectorDialog } from "./recipe-selector-dialog";
 import {
-  addMealPlanEntryAction,
-  updateMealPlanEntryAction,
-  deleteMealPlanEntryAction,
-} from "@/server-actions/mealPlan";
+  useAddMealPlanEntry,
+  useUpdateMealPlanEntry,
+  useDeleteMealPlanEntry,
+} from "@/hooks/use-meal-plan";
 
 interface MealSlotProps {
   date: string;
   mealType: string;
   entry?: MealPlanEntryWithRecipe;
-  onMutate?: () => void;
 }
 
-export function MealSlot({ date, mealType, entry, onMutate }: MealSlotProps) {
+export function MealSlot({ date, mealType, entry }: MealSlotProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+
+  const addEntry = useAddMealPlanEntry();
+  const updateEntry = useUpdateMealPlanEntry();
+  const deleteEntry = useDeleteMealPlanEntry();
+
+  const isLoading =
+    addEntry.isPending || updateEntry.isPending || deleteEntry.isPending;
 
   const handleSelectRecipe = async (recipeId: number) => {
-    setIsLoading(true);
     try {
       if (entry) {
-        await updateMealPlanEntryAction(entry.id, recipeId);
+        await updateEntry.mutateAsync({ entryId: entry.id, recipeId });
       } else {
-        await addMealPlanEntryAction(date, mealType, recipeId);
+        await addEntry.mutateAsync({ date, mealType, recipeId });
       }
       setIsDialogOpen(false);
-      onMutate?.();
     } catch (error) {
       console.error("Error selecting recipe:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const handleRemove = async () => {
     if (!entry) return;
 
-    setIsLoading(true);
     try {
-      await deleteMealPlanEntryAction(entry.id);
-      onMutate?.();
+      await deleteEntry.mutateAsync(entry.id);
     } catch (error) {
       console.error("Error removing meal:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
